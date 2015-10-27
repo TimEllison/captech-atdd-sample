@@ -1,17 +1,97 @@
-﻿@{
+﻿@model SampleApp.Models.ContactModel
+@{
     ViewBag.Title = "Contact";
 }
 <h2>@ViewBag.Title.</h2>
 <h3>@ViewBag.Message</h3>
+<div class="row">
+    <div class="col-lg-12">
+        @using (Html.BeginForm("Save", "Home", FormMethod.Post))
+        {
+            <fieldset>
+                <legend>Contact Information</legend>
+                <div class="row">
+                    <div class="col-lg-6">
+                        <div class="form-group">
+                            @Html.LabelFor(x => x.FirstName, new {@class = "form-label"})
+                            @Html.TextBoxFor(x => x.FirstName, new {@class = "form-control"})
+                            @Html.ValidationMessageFor(x=>x.FirstName)
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="form-group">
+                            @Html.LabelFor(x => x.LastName, new {@class = "form-label"})
+                            @Html.TextBoxFor(x => x.LastName, new {@class = "form-control"})
+                            @Html.ValidationMessageFor(x => x.LastName)
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="form-group">
+                            @Html.LabelFor(x => x.EmailAddress, new {@class = "form-label"})
+                            @Html.TextBoxFor(x => x.EmailAddress, new {@class = "form-control"})
+                            @Html.ValidationMessageFor(x => x.EmailAddress)
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="form-group">
+                            @Html.LabelFor(x => x.Age, new {@class = "form-label"})
+                            @Html.TextBoxFor(x => x.Age, new {@class = "form-control"})
+                            @Html.ValidationMessageFor(x => x.Age)
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="form-group">
+                            @Html.LabelFor(x => x.State, new {@class = "form-label"})
+                            @Html.DropDownListFor(x => x.State, (from m in Model.States select new SelectListItem() {Text = m.Value, Value = m.Key}), new {@class = "state-list form-control"})
+                            @Html.ValidationMessageFor(x => x.State)
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="form-group">
+                            @Html.LabelFor(x => x.County, new {@class = "form-label"})
+                            @Html.DropDownListFor(x => x.County, new SelectListItem[] {}, new {@class = "county-list form-control"})
+                            @Html.ValidationMessageFor(x => x.County)
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-12">
+                        <button class="btn btn-primary" type="submit">Submit Form</button>
+                    </div>
+                </div>
+            </fieldset>
+        }
+    </div>
+</div>
+@section scripts
+{
+<script>
+    $(function () {
+        var loadCounties = function (code) {
+            $.ajax({
+                url: "/home/counties/" + code,
+                success: function (data) {
+                    var $ct = $('.county-list');
+                    $('option', $ct).remove();
+                    $ct.append($('<option>', {
+                        value: '',
+                        text: '--Select'
+                    }));
+                    $(data).each(function (idx, item) {
+                        $ct.append($('<option>', {
+                            value: item.Key,
+                            text: item.Value
+                        }));
+                    });
+                }
+            });
+        };
 
-<address>
-    One Microsoft Way<br />
-    Redmond, WA 98052-6399<br />
-    <abbr title="Phone">P:</abbr>
-    425.555.0100
-</address>
-
-<address>
-    <strong>Support:</strong>   <a href="mailto:Support@example.com">Support@example.com</a><br />
-    <strong>Marketing:</strong> <a href="mailto:Marketing@example.com">Marketing@example.com</a>
-</address>
+        $(".state-list").on({
+            change: function () {
+                loadCounties($(this).val());
+            }
+        });
+    });
+</script>    
+}
